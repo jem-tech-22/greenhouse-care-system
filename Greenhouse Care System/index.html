@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4CAF50" />
+
+  <!-- SEO Meta Tags -->
+  <title>Greenhouse Care System | Smart IoT Monitoring for Temperature, Humidity & Water</title>
+  <meta name="description" content="A smart greenhouse monitoring system designed to track temperature, humidity, water level, and ventilation status in real time, helping maintain a healthy and controlled growing environment through simple IoT technology." />
+  <meta name="keywords" content="greenhouse monitoring, IoT greenhouse, temperature sensor, humidity sensor, water level monitor, smart farming, greenhouse automation, plant care system" />
+  <meta name="author" content="Greenhouse Care System" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://greenhousecaresystem.com/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://greenhousecaresystem.com/" />
+  <meta property="og:title" content="Greenhouse Care System | Smart IoT Monitoring" />
+  <meta property="og:description" content="Track temperature, humidity, water level, and ventilation in real time with our smart IoT greenhouse monitoring system." />
+  <meta property="og:image" content="https://greenhousecaresystem.com/og-image.jpg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Greenhouse Care System | Smart IoT Monitoring" />
+  <meta name="twitter:description" content="Track temperature, humidity, water level, and ventilation in real time with our smart IoT greenhouse monitoring system." />
+  <meta name="twitter:image" content="https://greenhousecaresystem.com/og-image.jpg" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Greenhouse Care System",
+    "description": "A smart greenhouse monitoring system designed to track temperature, humidity, water level, and ventilation status in real time.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Krona+One&display=swap" rel="stylesheet" />
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+<body>
+
+  <!-- =====================
+       NAV
+  ===================== -->
+  <nav role="navigation" aria-label="Main navigation">
+    <a href="#monitoring" class="nav-logo" aria-label="Greenhouse Care System Home">
+      <svg class="logo-svg" viewBox="0 0 140 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g>
+          <rect x="2" y="2" width="32" height="32" rx="6" fill="#3a7d44"/>
+          <path d="M18 26 C18 20 10 14 10 8 C14 8 22 10 24 18 C24 22 22 26 18 26Z" fill="#a8e6a3"/>
+          <path d="M18 26 C18 20 26 14 26 8 C22 8 14 10 12 18 C12 22 14 26 18 26Z" fill="#6dbf71" opacity="0.7"/>
+          <line x1="18" y1="14" x2="18" y2="26" stroke="#2d5f35" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+        <text x="40" y="14" font-family="'Krona One', sans-serif" font-size="6.5" fill="#4CAF50" letter-spacing="1">GREENHOUSE</text>
+        <text x="40" y="23" font-family="'Krona One', sans-serif" font-size="6.5" fill="#ffffff" letter-spacing="1">CARE</text>
+        <text x="40" y="32" font-family="'Krona One', sans-serif" font-size="6.5" fill="#ffffff" letter-spacing="1">SYSTEM</text>
+      </svg>
+    </a>
+
+    <div class="nav-links" role="list">
+      <a href="#monitoring" class="active" role="listitem">Monitoring</a>
+      <a href="#history" role="listitem">History</a>
+      <a href="#alert" role="listitem">Alert</a>
+    </div>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile navigation">
+    <a href="#monitoring" class="active">Monitoring</a>
+    <a href="#history">History</a>
+    <a href="#alert">Alert</a>
+  </div>
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
+
+  <!-- =====================
+       MAIN CONTENT
+  ===================== -->
+  <main>
+
+    <!-- MONITORING -->
+    <section id="monitoring" aria-label="Monitoring">
+      <div class="section-header fade-in-section">
+        <h2>Monitoring</h2>
+        <p>Check and control your environment real-time.</p>
+      </div>
+
+      <!-- Top row: Temperature + Humidity -->
+      <div class="monitor-row-top fade-in-section">
+
+        <article class="card metric-card" aria-label="Temperature">
+          <div class="metric-label-row">
+            <span class="metric-label">Temperature</span>
+            <i class="ph ph-thermometer metric-icon pulse" aria-hidden="true"></i>
+          </div>
+          <div class="metric-value" id="tempValue">67.67°C</div>
+          <div class="progress-bar-wrap" role="progressbar" aria-label="Temperature level" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar-fill shimmer" id="tempBar"></div>
+          </div>
+        </article>
+
+        <article class="card metric-card" aria-label="Humidity">
+          <div class="metric-label-row">
+            <span class="metric-label">Humidity</span>
+            <i class="ph ph-drop metric-icon pulse" aria-hidden="true"></i>
+          </div>
+          <div class="metric-value" id="humidValue">67%</div>
+          <div class="progress-bar-wrap" role="progressbar" aria-label="Humidity level" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar-fill shimmer" id="humidBar"></div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Bottom row: Water + Fan + Alert -->
+      <div class="monitor-row-bottom fade-in-section">
+
+        <article class="card status-card" aria-label="Water Level">
+          <div class="status-label-row">
+            <span class="status-label">Water Level</span>
+            <i class="ph ph-drop-half metric-icon pulse" aria-hidden="true"></i>
+          </div>
+          <div class="status-value">Normal</div>
+        </article>
+
+        <article class="card status-card" aria-label="Fan Status">
+          <div class="status-label-row">
+            <span class="status-label">Fan Status</span>
+            <i class="ph ph-fan metric-icon pulse" id="fanIcon" aria-hidden="true"></i>
+          </div>
+          <div class="status-value">Off</div>
+        </article>
+
+        <article class="card status-card" aria-label="Alert Status">
+          <div class="status-label-row">
+            <span class="status-label">Alert</span>
+            <i class="ph ph-bell metric-icon pulse" aria-hidden="true"></i>
+          </div>
+          <div class="status-value">Normal</div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="history" aria-label="History">
+      <div class="section-header fade-in-section">
+        <h2>History</h2>
+        <p>View and analyze previous temperature, humidity, and water level readings over time.</p>
+      </div>
+
+      <div class="history-table-wrap fade-in-section" role="region" aria-label="Sensor history table">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Time</th>
+              <th scope="col">Temp</th>
+              <th scope="col">Humidity</th>
+              <th scope="col">Water</th>
+              <th scope="col">Fan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>08/11/28</td>
+              <td>5:25 PM</td>
+              <td>29.7°C</td>
+              <td>65%</td>
+              <td>Normal</td>
+              <td>OFF</td>
+            </tr>
+            <tr>
+              <td>08/11/28</td>
+              <td>5:26 PM</td>
+              <td>29.7°C</td>
+              <td>65%</td>
+              <td>Normal</td>
+              <td>OFF</td>
+            </tr>
+            <tr>
+              <td>08/11/28</td>
+              <td>5:27 PM</td>
+              <td>30.2°C</td>
+              <td>68%</td>
+              <td>Normal</td>
+              <td>ON</td>
+            </tr>
+            <tr>
+              <td>08/11/28</td>
+              <td>5:28 PM</td>
+              <td>30.9°C</td>
+              <td>69%</td>
+              <td>Normal</td>
+              <td>ON</td>
+            </tr>
+            <tr>
+              <td>08/11/28</td>
+              <td>5:29 PM</td>
+              <td>31.0°C</td>
+              <td>70%</td>
+              <td>LOW</td>
+              <td>ON</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ALERT -->
+    <section id="alert" aria-label="Alerts">
+      <div class="section-header fade-in-section">
+        <h2>Alert</h2>
+        <p>Monitor important system notifications, including low water level and other sensor warnings.</p>
+      </div>
+
+      <div class="alert-grid fade-in-section">
+
+        <article class="card alert-card" aria-label="Low Water Alert">
+          <div class="alert-card-top">
+            <div class="alert-meta">
+              September 11, 2026 — 5:29 PM<br>
+              Water reservoir detected at low level
+            </div>
+            <i class="ph ph-drop alert-icon pulse" aria-hidden="true"></i>
+          </div>
+          <div class="alert-title">Low Water</div>
+        </article>
+
+        <article class="card alert-card" aria-label="High Temperature Alert">
+          <div class="alert-card-top">
+            <div class="alert-meta">
+              September 11, 2026 — 5:27 PM<br>
+              Temperature reached 30.2°C<br>
+              Fan automatically activated
+            </div>
+            <i class="ph ph-thermometer alert-icon pulse" aria-hidden="true"></i>
+          </div>
+          <div class="alert-title">High Temperature</div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================
+       FOOTER
+  ===================== -->
+  <footer role="contentinfo">
+    <!-- <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#monitoring">Monitoring</a>
+      <a href="#history">History</a>
+      <a href="#alert">Alert</a>
+    </nav> -->
+    <p class="footer-desc">
+      A smart greenhouse monitoring system designed to track temperature, humidity, water level, and ventilation status in real time, helping maintain a healthy and controlled growing environment through simple IoT technology.
+    </p>
+    <!-- <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="footer-github" aria-label="GitHub repository">
+      <i class="ph ph-github-logo" aria-hidden="true"></i>
+    </a> -->
+  </footer>
+
+  <button class="back-to-top" id="exitButton" type="button" aria-label="Exit website">
+    <i class="ph ph-sign-out" aria-hidden="true"></i>
+  </button>
+
+  <dialog class="exit-dialog" id="exitDialog" aria-labelledby="exitDialogTitle">
+    <form method="dialog">
+      <h2 id="exitDialogTitle">Do you want to exit?</h2>
+      <div class="exit-dialog-actions">
+        <button class="exit-confirm" id="confirmExit" value="confirm" type="submit">Yes</button>
+        <button class="exit-cancel" value="cancel" type="submit">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- JavaScript -->
+  <script src="main.js" defer></script>
+</body>
+</html>
