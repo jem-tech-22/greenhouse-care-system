@@ -15,13 +15,13 @@ const closeMobileMenu = () => {
 
 hamburgerBtn.addEventListener('click', () => {
   const isOpen = mobileMenu.classList.toggle('open');
+
   hamburgerBtn.classList.toggle('open', isOpen);
   hamburgerBtn.setAttribute('aria-expanded', isOpen);
   mobileMenuBackdrop.classList.toggle('visible', isOpen);
   document.body.classList.toggle('mobile-menu-open', isOpen);
 });
 
-// Close mobile menu on nav link click
 mobileMenu.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     closeMobileMenu();
@@ -30,38 +30,57 @@ mobileMenu.querySelectorAll('a').forEach(link => {
 
 mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
 
-// Close mobile menu on outside click
 document.addEventListener('click', (e) => {
-  if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+  if (
+    !mobileMenu.contains(e.target) &&
+    !hamburgerBtn.contains(e.target)
+  ) {
     closeMobileMenu();
   }
 });
+
 
 /* =====================
    ACTIVE NAV ON SCROLL
 ===================== */
 const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a');
+const navLinks = document.querySelectorAll(
+  '.nav-links a, .mobile-menu a'
+);
 
 navLinks.forEach(link => {
   link.addEventListener('click', () => {
-    navLinks.forEach(navLink => navLink.classList.remove('active'));
+    navLinks.forEach(navLink => {
+      navLink.classList.remove('active');
+    });
+
     link.classList.add('active');
   });
 });
 
 const setActiveLink = () => {
   let current = '';
+
   sections.forEach(section => {
     const top = section.offsetTop - 80;
-    if (window.scrollY >= top) current = section.id;
+
+    if (window.scrollY >= top) {
+      current = section.id;
+    }
   });
+
   navLinks.forEach(link => {
-    link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+    link.classList.toggle(
+      'active',
+      link.getAttribute('href') === `#${current}`
+    );
   });
 };
 
-window.addEventListener('scroll', setActiveLink, { passive: true });
+window.addEventListener('scroll', setActiveLink, {
+  passive: true
+});
+
 
 /* =====================
    EXIT
@@ -78,7 +97,9 @@ const toggleExitButton = () => {
 
   if (shouldShow && !isVisible) {
     exitButton.classList.remove('animate');
+
     void exitButton.offsetWidth;
+
     exitButton.classList.add('animate');
   }
 };
@@ -102,8 +123,12 @@ exitDialog.addEventListener('close', () => {
   document.body.classList.remove('dialog-open');
 });
 
-window.addEventListener('scroll', toggleExitButton, { passive: true });
+window.addEventListener('scroll', toggleExitButton, {
+  passive: true
+});
+
 toggleExitButton();
+
 
 /* =====================
    FADE-IN ON SCROLL
@@ -114,33 +139,220 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       const index = Array.from(fadeEls).indexOf(entry.target);
+
       setTimeout(() => {
         entry.target.classList.add('visible');
       }, 80 * (index % 4));
+
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.12 });
+}, {
+  threshold: 0.12
+});
 
 fadeEls.forEach(el => observer.observe(el));
 
+
 /* =====================
-   ANIMATE PROGRESS BARS
+   LIVE SENSOR DATA
 ===================== */
-const animateBars = () => {
-  const tempBar = document.getElementById('tempBar');
-  const humidBar = document.getElementById('humidBar');
 
-  setTimeout(() => {
-    tempBar.style.width = '68%';
-    humidBar.style.width = '67%';
+async function updateDashboard() {
+  try {
+    const response = await fetch('/api/latest');
 
-    // Remove shimmer after fill completes
-    setTimeout(() => {
-      tempBar.classList.remove('shimmer');
-      humidBar.classList.remove('shimmer');
-    }, 1200);
-  }, 500);
-};
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
 
-window.addEventListener('load', animateBars);
+    const data = await response.json();
+
+    if (!data) {
+      console.log("No sensor data available.");
+      return;
+    }
+
+
+    /* =====================
+       TEMPERATURE
+    ===================== */
+
+    const tempValue = document.getElementById('tempValue');
+    const tempBar = document.getElementById('tempBar');
+
+    const temperature = Number(data.temperature);
+
+    tempValue.textContent = `${temperature.toFixed(1)}°C`;
+
+    const tempPercent = Math.min(
+      Math.max((temperature / 40) * 100, 0),
+      100
+    );
+
+    tempBar.style.width = `${tempPercent}%`;
+
+
+    /* =====================
+       HUMIDITY
+    ===================== */
+
+    const humidValue = document.getElementById('humidValue');
+    const humidBar = document.getElementById('humidBar');
+
+    const humidity = Number(data.humidity);
+
+    humidValue.textContent = `${humidity.toFixed(0)}%`;
+
+    humidBar.style.width = `${humidity}%`;
+
+
+    /* =====================
+       WATER LEVEL
+    ===================== */
+
+    const waterStatus = document.getElementById('waterStatus');
+
+    const waterLevel = Number(data.water_level);
+
+    if (data.low_water === 1 || waterLevel < 300) {
+      waterStatus.textContent = `LOW (${waterLevel})`;
+    } else {
+      waterStatus.textContent = `Normal (${waterLevel})`;
+    }
+
+
+    /* =====================
+       FAN STATUS
+    ===================== */
+
+    const fanStatus = document.getElementById('fanStatus');
+
+    if (data.fan_status === "ON") {
+      fanStatus.textContent = "On";
+    } else {
+      fanStatus.textContent = "Off";
+    }
+
+
+    /* =====================
+       ALERT STATUS
+    ===================== */
+
+    const alertStatus = document.getElementById('alertStatus');
+
+    if (data.low_water === 1 || waterLevel < 300) {
+      alertStatus.textContent = "Low Water";
+    } else {
+      alertStatus.textContent = "Normal";
+    }
+
+
+    console.log("Dashboard updated:", data);
+
+  } catch (error) {
+    console.error(
+      "Failed to get sensor data:",
+      error
+    );
+  }
+}
+
+
+/* =====================
+   HISTORY TABLE
+===================== */
+
+async function updateHistory() {
+  try {
+    const response = await fetch('/api/history');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const readings = await response.json();
+
+    const tableBody = document.querySelector(
+      '#history tbody'
+    );
+
+    if (!tableBody) {
+      console.error("History table body not found.");
+      return;
+    }
+
+    tableBody.innerHTML = '';
+
+    readings.forEach(reading => {
+      const row = document.createElement('tr');
+
+      const date = new Date(
+        reading.created_at + 'Z'
+      );
+
+      const dateText = date.toLocaleDateString(
+        'en-US',
+        {
+          month: '2-digit',
+          day: '2-digit',
+          year: '2-digit'
+        }
+      );
+
+      const timeText = date.toLocaleTimeString(
+        'en-US',
+        {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }
+      );
+
+      const waterText =
+        reading.low_water === 1 ||
+        reading.water_level < 300
+          ? `LOW (${reading.water_level})`
+          : `Normal (${reading.water_level})`;
+
+      const fanText =
+        reading.fan_status === 'ON'
+          ? 'ON'
+          : 'OFF';
+
+      row.innerHTML = `
+        <td>${dateText}</td>
+        <td>${timeText}</td>
+        <td>${Number(reading.temperature).toFixed(1)}°C</td>
+        <td>${Number(reading.humidity).toFixed(0)}%</td>
+        <td>${waterText}</td>
+        <td>${fanText}</td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+
+    console.log(
+      "History updated:",
+      readings.length,
+      "records"
+    );
+
+  } catch (error) {
+    console.error(
+      "Failed to get history:",
+      error
+    );
+  }
+}
+
+
+/* =====================
+   START LIVE UPDATES
+===================== */
+
+updateDashboard();
+updateHistory();
+
+setInterval(updateDashboard, 2000);
+setInterval(updateHistory, 5000);
