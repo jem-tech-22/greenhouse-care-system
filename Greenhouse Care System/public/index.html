@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,8 +54,8 @@
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
-
 </head>
+
 <body>
 
   <!-- =====================
@@ -81,7 +82,14 @@
       <a href="#alert" role="listitem">Alert</a>
     </div>
 
-    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileMenu">
+    <button
+      class="hamburger"
+      id="hamburgerBtn"
+      type="button"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+      aria-controls="mobileMenu"
+    >
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -92,6 +100,7 @@
     <a href="#history">History</a>
     <a href="#alert">Alert</a>
   </div>
+
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
 
   <!-- =====================
@@ -103,7 +112,7 @@
     <section id="monitoring" aria-label="Monitoring">
       <div class="section-header fade-in-section">
         <h2>Monitoring</h2>
-        <p>Check and control your environment real-time.</p>
+        <p>Check and control your environment in real time.</p>
       </div>
 
       <!-- Top row: Temperature + Humidity -->
@@ -114,9 +123,18 @@
             <span class="metric-label">Temperature</span>
             <i class="ph ph-thermometer metric-icon pulse" aria-hidden="true"></i>
           </div>
-          <div class="metric-value" id="tempValue">67.67°C</div>
-          <div class="progress-bar-wrap" role="progressbar" aria-label="Temperature level" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-bar-fill shimmer" id="tempBar"></div>
+
+          <div class="metric-value" id="tempValue">--°C</div>
+
+          <div
+            class="progress-bar-wrap"
+            role="progressbar"
+            aria-label="Temperature level"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="40"
+          >
+            <div class="progress-bar-fill shimmer" id="tempBar" style="width: 0%"></div>
           </div>
         </article>
 
@@ -125,9 +143,18 @@
             <span class="metric-label">Humidity</span>
             <i class="ph ph-drop metric-icon pulse" aria-hidden="true"></i>
           </div>
-          <div class="metric-value" id="humidValue">67%</div>
-          <div class="progress-bar-wrap" role="progressbar" aria-label="Humidity level" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-bar-fill shimmer" id="humidBar"></div>
+
+          <div class="metric-value" id="humidValue">--%</div>
+
+          <div
+            class="progress-bar-wrap"
+            role="progressbar"
+            aria-label="Humidity level"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <div class="progress-bar-fill shimmer" id="humidBar" style="width: 0%"></div>
           </div>
         </article>
 
@@ -141,7 +168,7 @@
             <span class="status-label">Water Level</span>
             <i class="ph ph-drop-half metric-icon pulse" aria-hidden="true"></i>
           </div>
-          <div class="status-value" id="waterStatus">Normal</div>
+          <div class="status-value" id="waterStatus">Loading...</div>
         </article>
 
         <article class="card status-card" aria-label="Fan Status">
@@ -149,7 +176,7 @@
             <span class="status-label">Fan Status</span>
             <i class="ph ph-fan metric-icon pulse" id="fanIcon" aria-hidden="true"></i>
           </div>
-          <div class="status-value" id="fanStatus">Off</div>
+          <div class="status-value" id="fanStatus">Loading...</div>
         </article>
 
         <article class="card status-card" aria-label="Alert Status">
@@ -157,7 +184,7 @@
             <span class="status-label">Alert</span>
             <i class="ph ph-bell metric-icon pulse" aria-hidden="true"></i>
           </div>
-          <div class="status-value" id="alertStatus">Normal</div>
+          <div class="status-value" id="alertStatus">Loading...</div>
         </article>
 
       </div>
@@ -170,7 +197,12 @@
         <p>View and analyze previous temperature, humidity, and water level readings over time.</p>
       </div>
 
-      <div class="history-table-wrap fade-in-section" role="region" aria-label="Sensor history table">
+      <div
+        class="history-table-wrap fade-in-section"
+        role="region"
+        aria-label="Sensor history table"
+        tabindex="0"
+      >
         <table>
           <thead>
             <tr>
@@ -182,46 +214,13 @@
               <th scope="col">Fan</th>
             </tr>
           </thead>
+
+          <!-- Populated dynamically by main.js -->
           <tbody>
             <tr>
-              <td>08/11/28</td>
-              <td>5:25 PM</td>
-              <td>29.7°C</td>
-              <td>65%</td>
-              <td>Normal</td>
-              <td>OFF</td>
-            </tr>
-            <tr>
-              <td>08/11/28</td>
-              <td>5:26 PM</td>
-              <td>29.7°C</td>
-              <td>65%</td>
-              <td>Normal</td>
-              <td>OFF</td>
-            </tr>
-            <tr>
-              <td>08/11/28</td>
-              <td>5:27 PM</td>
-              <td>30.2°C</td>
-              <td>68%</td>
-              <td>Normal</td>
-              <td>ON</td>
-            </tr>
-            <tr>
-              <td>08/11/28</td>
-              <td>5:28 PM</td>
-              <td>30.9°C</td>
-              <td>69%</td>
-              <td>Normal</td>
-              <td>ON</td>
-            </tr>
-            <tr>
-              <td>08/11/28</td>
-              <td>5:29 PM</td>
-              <td>31.0°C</td>
-              <td>70%</td>
-              <td>LOW</td>
-              <td>ON</td>
+              <td colspan="6" style="text-align: center;">
+                Waiting for sensor history...
+              </td>
             </tr>
           </tbody>
         </table>
@@ -240,8 +239,8 @@
         <article class="card alert-card" aria-label="Low Water Alert">
           <div class="alert-card-top">
             <div class="alert-meta">
-              September 11, 2026 — 5:29 PM<br>
-              Water reservoir detected at low level
+              Water reservoir monitoring<br>
+              Low water warning when the level is 190 or below
             </div>
             <i class="ph ph-drop alert-icon pulse" aria-hidden="true"></i>
           </div>
@@ -251,9 +250,8 @@
         <article class="card alert-card" aria-label="High Temperature Alert">
           <div class="alert-card-top">
             <div class="alert-meta">
-              September 11, 2026 — 5:27 PM<br>
-              Temperature reached 30.2°C<br>
-              Fan automatically activated
+              Temperature monitoring<br>
+              Fan activation depends on your configured temperature threshold
             </div>
             <i class="ph ph-thermometer alert-icon pulse" aria-hidden="true"></i>
           </div>
@@ -269,29 +267,48 @@
        FOOTER
   ===================== -->
   <footer role="contentinfo">
-    <!-- <nav class="footer-links" aria-label="Footer navigation">
+    <!--
+    <nav class="footer-links" aria-label="Footer navigation">
       <a href="#monitoring">Monitoring</a>
       <a href="#history">History</a>
       <a href="#alert">Alert</a>
-    </nav> -->
+    </nav>
+    -->
+
     <p class="footer-desc">
       A smart greenhouse monitoring system designed to track temperature, humidity, water level, and ventilation status in real time, helping maintain a healthy and controlled growing environment through simple IoT technology.
     </p>
-    <!-- <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="footer-github" aria-label="GitHub repository">
+
+    <!--
+    <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="footer-github" aria-label="GitHub repository">
       <i class="ph ph-github-logo" aria-hidden="true"></i>
-    </a> -->
+    </a>
+    -->
   </footer>
 
-  <button class="back-to-top" id="exitButton" type="button" aria-label="Exit website">
+  <!-- Exit Button -->
+  <button
+    class="back-to-top"
+    id="exitButton"
+    type="button"
+    aria-label="Exit website"
+  >
     <i class="ph ph-sign-out" aria-hidden="true"></i>
   </button>
 
+  <!-- Exit Confirmation Dialog -->
   <dialog class="exit-dialog" id="exitDialog" aria-labelledby="exitDialogTitle">
     <form method="dialog">
       <h2 id="exitDialogTitle">Do you want to exit?</h2>
+
       <div class="exit-dialog-actions">
-        <button class="exit-confirm" id="confirmExit" value="confirm" type="submit">Yes</button>
-        <button class="exit-cancel" value="cancel" type="submit">Cancel</button>
+        <button class="exit-confirm" id="confirmExit" value="confirm" type="submit">
+          Yes
+        </button>
+
+        <button class="exit-cancel" value="cancel" type="submit">
+          Cancel
+        </button>
       </div>
     </form>
   </dialog>

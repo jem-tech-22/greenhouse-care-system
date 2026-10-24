@@ -1,3 +1,4 @@
+
 /* =====================
    HAMBURGER MENU
 ===================== */
@@ -183,14 +184,16 @@ async function updateDashboard() {
 
     const temperature = Number(data.temperature);
 
-    tempValue.textContent = `${temperature.toFixed(1)}°C`;
+    if (Number.isFinite(temperature)) {
+      tempValue.textContent = `${temperature.toFixed(1)}°C`;
 
-    const tempPercent = Math.min(
-      Math.max((temperature / 40) * 100, 0),
-      100
-    );
+      const tempPercent = Math.min(
+        Math.max((temperature / 40) * 100, 0),
+        100
+      );
 
-    tempBar.style.width = `${tempPercent}%`;
+      tempBar.style.width = `${tempPercent}%`;
+    }
 
 
     /* =====================
@@ -202,9 +205,16 @@ async function updateDashboard() {
 
     const humidity = Number(data.humidity);
 
-    humidValue.textContent = `${humidity.toFixed(0)}%`;
+    if (Number.isFinite(humidity)) {
+      humidValue.textContent = `${humidity.toFixed(0)}%`;
 
-    humidBar.style.width = `${humidity}%`;
+      const humidityPercent = Math.min(
+        Math.max(humidity, 0),
+        100
+      );
+
+      humidBar.style.width = `${humidityPercent}%`;
+    }
 
 
     /* =====================
@@ -215,10 +225,18 @@ async function updateDashboard() {
 
     const waterLevel = Number(data.water_level);
 
-    if (data.low_water === 1 || waterLevel < 300) {
-      waterStatus.textContent = `LOW (${waterLevel})`;
-    } else {
-      waterStatus.textContent = `Normal (${waterLevel})`;
+    // 0–190 = LOW; 191 and above = NORMAL
+    const isLowWater =
+      Number.isFinite(waterLevel) &&
+      waterLevel >= 0 &&
+      waterLevel <= 190;
+
+    if (waterStatus) {
+      waterStatus.textContent = Number.isFinite(waterLevel)
+        ? isLowWater
+          ? `LOW (${waterLevel})`
+          : `Normal (${waterLevel})`
+        : 'Unavailable';
     }
 
 
@@ -228,10 +246,12 @@ async function updateDashboard() {
 
     const fanStatus = document.getElementById('fanStatus');
 
-    if (data.fan_status === "ON") {
-      fanStatus.textContent = "On";
-    } else {
-      fanStatus.textContent = "Off";
+    if (fanStatus) {
+      if (data.fan_status === "ON") {
+        fanStatus.textContent = "On";
+      } else {
+        fanStatus.textContent = "Off";
+      }
     }
 
 
@@ -241,10 +261,10 @@ async function updateDashboard() {
 
     const alertStatus = document.getElementById('alertStatus');
 
-    if (data.low_water === 1 || waterLevel < 300) {
-      alertStatus.textContent = "Low Water";
-    } else {
-      alertStatus.textContent = "Normal";
+    if (alertStatus) {
+      alertStatus.textContent = isLowWater
+        ? "Low Water"
+        : "Normal";
     }
 
 
@@ -284,11 +304,27 @@ async function updateHistory() {
 
     tableBody.innerHTML = '';
 
+    if (!Array.isArray(readings) || readings.length === 0) {
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+
+      cell.colSpan = 6;
+      cell.textContent = 'No history available yet.';
+      cell.style.textAlign = 'center';
+
+      row.appendChild(cell);
+      tableBody.appendChild(row);
+      return;
+    }
+
     readings.forEach(reading => {
       const row = document.createElement('tr');
 
+      // Preserve the original timestamp formatting
       const date = new Date(
-        reading.created_at + 'Z'
+        reading.created_at.endsWith('Z')
+          ? reading.created_at
+          : reading.created_at + 'Z'
       );
 
       const dateText = date.toLocaleDateString(
@@ -309,25 +345,40 @@ async function updateHistory() {
         }
       );
 
-      const waterText =
-        reading.low_water === 1 ||
-        reading.water_level < 300
-          ? `LOW (${reading.water_level})`
-          : `Normal (${reading.water_level})`;
+      const waterLevel = Number(reading.water_level);
+
+      // 0–190 = LOW; 191 and above = NORMAL
+      const isLowWater =
+        Number.isFinite(waterLevel) &&
+        waterLevel >= 0 &&
+        waterLevel <= 190;
+
+      const waterText = Number.isFinite(waterLevel)
+        ? isLowWater
+          ? `LOW (${waterLevel})`
+          : `Normal (${waterLevel})`
+        : 'Unavailable';
 
       const fanText =
         reading.fan_status === 'ON'
           ? 'ON'
           : 'OFF';
 
-      row.innerHTML = `
-        <td>${dateText}</td>
-        <td>${timeText}</td>
-        <td>${Number(reading.temperature).toFixed(1)}°C</td>
-        <td>${Number(reading.humidity).toFixed(0)}%</td>
-        <td>${waterText}</td>
-        <td>${fanText}</td>
-      `;
+      // Create cells without inserting sensor values as HTML
+      const values = [
+        dateText,
+        timeText,
+        `${Number(reading.temperature).toFixed(1)}°C`,
+        `${Number(reading.humidity).toFixed(0)}%`,
+        waterText,
+        fanText
+      ];
+
+      values.forEach(value => {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
 
       tableBody.appendChild(row);
     });
@@ -351,8 +402,10 @@ async function updateHistory() {
    START LIVE UPDATES
 ===================== */
 
+// Dashboard refreshes every 2 seconds
 updateDashboard();
-updateHistory();
-
 setInterval(updateDashboard, 2000);
-setInterval(updateHistory, 5000);
+
+// History refreshes every 60 seconds
+updateHistory();
+setInterval(updateHistory, 60000);

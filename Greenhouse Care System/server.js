@@ -1,12 +1,11 @@
-
 const express = require("express");
 const Database = require("better-sqlite3");
 
 const app = express();
 const PORT = 3000;
+const HISTORY_INTERVAL = 60 * 1000;
 
-// Temporary API key for development.
-// The ESP32 must send the same key.
+// API key authentication
 const API_KEY =
   process.env.GREENHOUSE_API_KEY || "change-this-key";
 
@@ -27,11 +26,30 @@ db.exec(`
   )
 `);
 
-/* =====================
-   SAVE SENSOR READING
-   API KEY AUTHENTICATION
-===================== */
+const insertReading = db.prepare(`
+  INSERT INTO readings
+  (temperature, humidity, water_level, fan_status, low_water)
+  VALUES (?, ?, ?, ?, ?)
+`);
 
+const getLatestSaved = db.prepare(`
+  SELECT * FROM readings
+  ORDER BY id DESC
+  LIMIT 1
+`);
+
+const getHistory = db.prepare(`
+  SELECT id, temperature, humidity, water_level,
+         fan_status, low_water, created_at
+  FROM readings
+  ORDER BY id DESC
+  LIMIT 50
+`);
+
+let latestReading = getLatestSaved.get() || null;
+let lastHistorySaveAt = 0;
+
+// Receive live readings from ESP32
 app.post("/api/readings", (req, res) => {
   const providedKey = req.get("x-api-key");
 
@@ -50,7 +68,6 @@ app.post("/api/readings", (req, res) => {
     low_water
   } = req.body;
 
-  // Basic validation
   if (
     typeof temperature !== "number" ||
     typeof humidity !== "number" ||
@@ -64,79 +81,73 @@ app.post("/api/readings", (req, res) => {
     });
   }
 
-  try {
-    const insert = db.prepare(`
-      INSERT INTO readings
-      (temperature, humidity, water_level, fan_status, low_water)
-      VALUES (?, ?, ?, ?, ?)
-    `);
+  const now = Date.now();
 
-    insert.run(
-      temperature,
-      humidity,
-      water_level,
-      fan_status,
-      low_water
-    );
+  // Keep the newest sensor values in memory for the live dashboard.
+  latestReading = {
+    ...(latestReading || {}),
+    temperature,
+    humidity,
+    water_level,
+    fan_status,
+    low_water,
+    created_at: new Date(now).toISOString()
+  };
+
+  try {
+    // Save history immediately on the first reading,
+    // then save at most once every 60 seconds.
+    if (
+      lastHistorySaveAt === 0 ||
+      now - lastHistorySaveAt >= HISTORY_INTERVAL
+    ) {
+      insertReading.run(
+        temperature,
+        humidity,
+        water_level,
+        fan_status,
+        low_water
+      );
+
+      lastHistorySaveAt = now;
+      latestReading = {
+        ...latestReading,
+        id: Number(db.prepare(
+          "SELECT last_insert_rowid() AS id"
+        ).get().id)
+      };
+
+      console.log("History reading saved.");
+    }
 
     res.json({
       success: true,
-      message: "Reading saved"
+      message: "Live reading received"
     });
   } catch (error) {
     console.error("Database error:", error.message);
 
     res.status(500).json({
       success: false,
-      message: "Failed to save reading"
+      message: "Failed to process reading"
     });
   }
 });
 
-/* =====================
-   GET LATEST READING
-===================== */
-
+// Get the newest live sensor values
 app.get("/api/latest", (req, res) => {
-  const reading = db.prepare(`
-    SELECT *
-    FROM readings
-    ORDER BY id DESC
-    LIMIT 1
-  `).get();
-
-  res.json(reading || null);
+  res.json(latestReading);
 });
 
-/* =====================
-   GET SENSOR HISTORY
-===================== */
-
+// Get saved history records
 app.get("/api/history", (req, res) => {
-  const readings = db.prepare(`
-    SELECT
-      id,
-      temperature,
-      humidity,
-      water_level,
-      fan_status,
-      low_water,
-      created_at
-    FROM readings
-    ORDER BY id DESC
-    LIMIT 50
-  `).all();
-
-  res.json(readings);
+  res.json(getHistory.all());
 });
-
-/* =====================
-   START SERVER
-===================== */
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `Greenhouse server running at http://localhost:${PORT}`
   );
-  console.log("API key authentication enabled for POST /api/readings");
+  console.log("API key authentication enabled.");
+  console.log("History saving interval: 60 seconds.");
 });
